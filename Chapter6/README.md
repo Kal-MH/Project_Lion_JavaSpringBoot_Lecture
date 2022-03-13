@@ -61,10 +61,10 @@ spring:
 
 ```yaml
 dependencies {
-	...
-	runtimeOnly 'mysql:mysql-connector-java'
-	**runtimeOnly 'com.h2database:h2'**
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  ...
+  runtimeOnly 'mysql:mysql-connector-java'
+  **runtimeOnly 'com.h2database:h2'**
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 ```
 
@@ -175,7 +175,7 @@ logging:
 logging:
   level:
     root: debug
-		dev.kalmh: info
+    dev.kalmh: info
 
 # private static final Logger logger = LoggerFactory.getLogger(ProfileComponent.class);
 ```
