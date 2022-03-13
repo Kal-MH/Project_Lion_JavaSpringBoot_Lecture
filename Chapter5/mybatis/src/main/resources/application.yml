@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc.mysql://127.0.0.1:3306/demo_schema
+    username: demo-user
+    password: demo-user-password1!
+
+mybatis:
+  mapper-locations: "classpath:mybatis/mappers/*.xml"
+  configuration:
+    map-underscore-to-camel-case : true
+#    데이터베이스는 snake case, 자바는 camel case 이기 때문에 이 간극을 줄여주기 위한 설정
