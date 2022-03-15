@@ -2,26 +2,29 @@ spring:
   profiles:
     active: test
 
-custom:
-  property:
-    single: custom-property
-    comlist: comma, sparated, list, to, value
-# custom.property.single
-# custom.property.comlist
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.17.0.1:3306/demo_jpa_schema
-    username: demo-jpa
-    password: demo-jpa-password1!
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+management:
+  endpoints:
+    # enabled : actuator가 가지고 있는 빈을 실제로 사용할지 말지를 결정
+    # true로 설정하면 endpoint 각각의 enabled를 설정할 필요가 없다.
+    enabled-by-default: false
+    web:
+      # exposure에 포함되지 않으면 endpoint가 존재하지 않는다.
+      # 어플리케이션 내부에는 존재하지만 정보를 받아올 수는 없는 상태가 된다.
+      exposure:
+        include: health, info, loggers, shutdown, prometheus
+# management.endpoint.<function>.enabled=true
+# management.endpoint.<function>.show-details=always
+  endpoint:
+    # endpoint health의 설정
+    health:
+      enabled: true
+      show-details: always
+      show-components: always
+    info:
+      enabled: true
+    loggers:
+      enabled: true
+    shutdown:
+      enabled: true
+    prometheus:
+      enabled: true

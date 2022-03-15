@@ -7,7 +7,6 @@ writer varchar
 board int
  */
 
-import jdk.jfr.Name;
 
 import javax.persistence.*;
 
@@ -22,30 +21,29 @@ public class PostEntity extends BaseEntity {
     private String writer;
 
     //Board의 PK인 id를 가리키는 foreign key라고 말할 수 있다.
-    @ManyToOne(
-            targetEntity = BoardEntity.class,
-            fetch = FetchType.LAZY
-    )
-    @JoinColumn(name = "board_id")
-    private BoardEntity boardEntity;
+//    @ManyToOne(
+//            targetEntity = BoardEntity.class,
+//            fetch = FetchType.LAZY
+//    )
+//    @JoinColumn(name = "board_id")
+//    private BoardEntity boardEntity;
 
     public PostEntity() {}
 
-    public PostEntity(Long id, String title, String content, String writer, BoardEntity boardEntity) {
+    public PostEntity(Long id, String title, String content, String writer) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
-        this.boardEntity = boardEntity;
     }
 
-    public BoardEntity getBoardEntity() {
-        return boardEntity;
-    }
-
-    public void setBoardEntity(BoardEntity boardEntity) {
-        this.boardEntity = boardEntity;
-    }
+//    public BoardEntity getBoardEntity() {
+//        return boardEntity;
+//    }
+//
+//    public void setBoardEntity(BoardEntity boardEntity) {
+//        this.boardEntity = boardEntity;
+//    }
 
     public Long getId() {
         return id;

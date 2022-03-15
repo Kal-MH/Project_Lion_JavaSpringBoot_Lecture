@@ -1,6 +1,5 @@
 package deb.kalmh.jpa.repository;
 
-import deb.kalmh.jpa.entity.BoardEntity;
 import deb.kalmh.jpa.entity.PostEntity;
 import org.springframework.data.repository.CrudRepository;
 

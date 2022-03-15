@@ -11,14 +11,15 @@ public class PostDto {
     private String title;
     private String content;
     private String writer;
-    private int boardId;
+//    private int boardId;
 
-    public PostDto(int id, String title, String content, String writer, int boardId) {
+    public PostDto() {}
+    public PostDto(int id, String title, String content, String writer) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
-        this.boardId = boardId;
+//        this.boardId = boardId;
     }
 
     public int getId() {
@@ -53,13 +54,13 @@ public class PostDto {
         this.writer = writer;
     }
 
-    public int getBoardId() {
-        return boardId;
-    }
-
-    public void setBoardId(int boardId) {
-        this.boardId = boardId;
-    }
+//    public int getBoardId() {
+//        return boardId;
+//    }
+//
+//    public void setBoardId(int boardId) {
+//        this.boardId = boardId;
+//    }
 
     @Override
     public String toString() {
@@ -68,7 +69,6 @@ public class PostDto {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", writer='" + writer + '\'' +
-                ", boardId=" + boardId +
                 '}';
     }
 }
