@@ -350,14 +350,6 @@ spring.mvc.view.suffix: .jsp // -> 확장자가 혹은 전체 경로에서 .jsp 
             return modelAndView;
         }
         ```
-        
-
-## React, Vue, Node와 Spring Boot
-
-# Postman
-
-# Reference
-
 ---
 
  (출처 : The Origin: Java Spring Boot 강의 - 강사 박지호)
