@@ -28,6 +28,8 @@ public class PostController {
     }
     @GetMapping("")
     public List<PostDto> readPostAll() {
+
+        logger.trace("logger trace readPostAll");
         return this.postService.readPostAll();
     }
 
