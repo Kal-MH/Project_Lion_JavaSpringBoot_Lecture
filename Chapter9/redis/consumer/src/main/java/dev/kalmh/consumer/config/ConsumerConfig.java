@@ -1,5 +1,6 @@
 package dev.kalmh.consumer.config;
 
+import com.google.gson.Gson;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,4 +11,7 @@ public class ConsumerConfig {
     public Queue queue() {
         return new Queue("boot.amqp.worker-queue", true, false, false);
     }
+
+    @Bean
+    public Gson gson() {return  new Gson();}
 }
