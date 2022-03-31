@@ -9,7 +9,7 @@
 | 5주차 | JPA & Mybatis | [Chapter5](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter5) |
 | 6주차 | Spring Boot Properties 및 Loggin Level, Validation | [Chpater6](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter6) |
 | 7주차 | 자바 예외처리, Filter & Interceptor 및 테스트 코드 작성 | [Chapter7](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter7) |
-| 8주차 | | |
+| 8주차 | Spring Security & OAuth2 | |
 | 9주차 | Job-Queue&Pub-Sub Pattern 구현 및 RabbitMQ, Redis사용. WebSocker, WebClient 구현 | [Chapter9](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter9) |
 | 10주차 | | |
 
