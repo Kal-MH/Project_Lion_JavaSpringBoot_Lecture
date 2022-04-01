@@ -727,3 +727,35 @@ JWT 같은 경우에는 비밀키를 사용해서 암호화를 진행하고 공�
 - 공개키를 통해 복호화 : 암호를 해석할 수 있는 대상에 대해 제한이 없음
 
 즉, 일종의 자격증처럼 제공할 수 있는 대상이 한정적이다 보니, 사용자의 권한이 같이 포함되면 변조하기가 힘들다는 장점이 있다.
+
+# OAuth2 서버 만들어보기
+
+### 서버 구성
+
+- Authorization 서버
+    
+    ```java
+    implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.2.2'
+    ```
+    
+- Resource 서버
+    - 외적인 페이지가 존재x
+    - Authorization에서 발급받은 토큰을 검증하고 사용자가 필요로 하는 데이터를 반환하는 서버
+- Client 서버
+    
+    ```java
+    //resource서버에 요청을 보내기 위해 추가된 의존성 : webflux, netty
+    	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    	implementation 'io.projectreactor.netty:reactor-netty:1.0.9'
+    ```
+    
+
+### 서버 간단 구현
+
+- Authorization 서버
+    - `RegisteredClientService` : 로그인 제공하는 클라이언트를 다루기 위해 서비스 객체 생성.
+    - `AuthServerConfig` : 필터 함수, 암호화 진행을 위한 키 발급 함수 등을 정의
+- Client 서버
+    - `/home` : 로그인하기 위해서 Authorization 서버로 리다이렉션이 진행된다.
+    - `/` : root로 들어오는 요청은 사용자가 로그인되어 있어야 한다.
+        - 사용자 토큰 검증 후, resource서버로 데이터 요청(WebClient)
