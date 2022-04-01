@@ -1,6 +1,7 @@
 package dev.kalmh.auth.config;
 
 import dev.kalmh.auth.infra.CustomUserDetailService;
+import dev.kalmh.auth.infra.NaverOAuth2Service;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,13 +16,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
+    private final NaverOAuth2Service naverOAuth2Service;
 
     public WebSecurityConfig(
             PasswordEncoder passwordEncoder,
-            CustomUserDetailService customDetailService
+            CustomUserDetailService customDetailService,
+            NaverOAuth2Service naverOAuth2Service
     ) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = customDetailService;
+        this.naverOAuth2Service = naverOAuth2Service;
     }
     //사용자 요청 메소드 관리를 위한 설정
     // - 설정이 안되어 있다면 기본적으로 default security password를 사용하게 된다.(터미널 참고)
@@ -59,6 +63,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/home")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
-                .permitAll();
+                .permitAll()
+            .and()
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(this.naverOAuth2Service)
+                .and()
+                .defaultSuccessUrl("/home")
+            .and()
+                .oauth2Client();
+
     }
 }
