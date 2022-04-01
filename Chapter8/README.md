@@ -624,7 +624,7 @@ Spring IoC 컨테이너는 사용자의 요청에 정의된 인증 정보를 `Re
               naver:
                 # 인증해달라는 요청을 어디에 보낼 것인지
                 authorization-uri: https://nid.naver.com/oauth2.0/authorize
-    			# Access Token 발급, 갱신, 삭제 등을 위한 URI
+                # Access Token 발급, 갱신, 삭제 등을 위한 URI
                 token-uri: https://nid.naver.com/oauth2.0/token
                 # 사용자 정보 요청을 위한 경로
                 user-info-uri: https://openapi.naver.com/v1/nid/me
