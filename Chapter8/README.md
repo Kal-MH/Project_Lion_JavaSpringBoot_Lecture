@@ -524,4 +524,206 @@ Spring IoC 컨테이너는 사용자의 요청에 정의된 인증 정보를 `Re
             
             이를 기반으로 `homeController`를 작성할 수 있다.
             
-```
+# OAuth2와 JWT
+
+## Social Login OAuth2
+
+### Single Sign On
+
+![oauth2](https://user-images.githubusercontent.com/59648372/161184120-9d326016-0fa4-45a8-9ef3-61666e24b772.png)
+
+
+한 번에 로그인으로 여러 개의 서비스를 사용할 수 있게 하는 것.
+
+예를 들어, 서브 도메인과 전체 인증을 관리하는 SSO서버가 존재한다고 보자.
+
+1. 사용자가 하나의 서비스로 이동 및 로그인 요청
+2. 서브 도메인에서 SSO 서버로 로그인 요청함. 
+    1. 로그인 페이지로 forward
+3. SSO 서버에서 로그인 진행 및 로그인 정보를 쿠키로 해당 도메인에 저장.
+    1. 더불어 부수적인 토큰을 반환해준다.
+4. SSO 서버에서 만들어낸 쿠키는 독립적이기 때문에 요청 서브 도메인에서는 확인할 수 없지만, 반환 받은 토큰을 통해 요청함으로써 쿠키 내용을 응답 받는다.
+    1. 해당 쿠키를 자신의 브라우저에 저장한다.
+5. 다른 서브 도메인에서 로그인 요청
+6. 이미 SSO서버에서는 로그인 완료되어 쿠키를 저장하고 있기 때문에 앞선 과정과 똑같이 토큰을 반환, 해당 서브 도메인에서는 토큰으로 권한을 확인할 수 있다.
+
+### Social Login
+
+기본적으로 한 번의 로그인으로 여러 서비스를 사용한다는 관점에서 Single sign on과 맥락을 같이한다. 다만, Single Sign On은 동일한 서비스 범주 안에서 다양한 하위 서비스를 사용한다면, 소셜 로그인은 연관성 없는 서비스를 대상으로 이뤄진다.
+
+이렇게 다른 서비스로 사용자 정보를 안전하게 전달하기 위해 `OAuth(Open Authorization)`라는 규칙이 정해졌다.
+
+1. 사용자가 클라이언트(서비스)에 접속
+2. 클라이언트에게 로그인을 요구
+3.  사용자가 전달한 로그인 정보를 제공자(소셜 서비스, oauth auth)의 인증서버로 전달.
+4. 인증 서버에서 로그인을 진행하고 토큰을 발행.
+5. 유저 정보가 필요할 때, access token을 소셜 서비스 resource서버로 전달.
+6. resource서버로부터 접속 요청 사용자의 정보 전달
+7. 사용자 정보를 기반으로 서비스 제공 
+
+소셜 로그인은 로그인 기능 자체가 진행되는 것이 아니라, **정보를 갖고 있는 원소유주에게 정보를 요청하는 과정**이라고 말할 수 있다. 또한, 해당 정보를 받고 나서는 받은 유저 정보를 관리하는 부분이 필요하다.
+
+### 현실에서의 Social Login
+
+실제 동작 과정에서는 클라이언트에서 로그인이 진행되기 보다는 해당 로그인 사이트로 이동해서 진행하게 된다. 
+
+- 사용자가 로그인하길 원한다는 정보를 url의 query parameter와 같은 형태로 서비스 인증 서버에 전달하게 된다.
+
+이후, 사용자가 로그인을 진행했다는 사실을 소셜 로그인 사용하는 서비스에 알려주게 되며 어플리케이션의 callback url을 통해서 정보를 받게 된다.
+
+## Naver Login 구현하기
+
+### Naver application지정
+
+1. Naver Developers 어플리케이션 등록
+    1. 이메일 주소 선택
+    2. API 서비스 환경
+        1. WEB 선택
+            1. 서비스 URL : http:localhost:8080
+            2. 콜백
+                1. http://localhost:8080/login/oauth2/code/naver
+                2. http://localhost:8080/login/callback
+
+### 구현
+
+1. build.gradle
+    
+    ```java
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.2.2'
+    ```
+    
+2. yml파일 작성
+    
+    ```yaml
+    spring:
+      datasource:
+        url: jdbc:h2:mem:testdb
+        driver-class-name: org.h2.Driver
+        username: sa
+        password: password
+      jpa:
+        database: h2
+        database-platform: org.hibernate.dialect.H2Dialect
+      security:
+        oauth2:
+          client:
+            registration:
+              # 복수로 여러 서비스를 등록할 수 있다. naver, kakao, google, ...
+              naver:
+                client-id: <your_client_id>
+                client-secret: <your_client_secret>
+                # oauth2 서버에서 보내주는 access 토큰을 전달받는 uri 설정
+                # - 네이버 어플리케이션에 등록했던 redirection uri
+                redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+                # 정보 제공 방식에 대한 설정. 단순 로그인뿐만 아니라 다른 형태로 사용자 정보를 받아오는 경우
+                authorization-grant-type: authorization_code
+                scope: email
+                client-name: Naver
+            provider:
+              naver:
+                # 인증해달라는 요청을 어디에 보낼 것인지
+                authorization-uri: https://nid.naver.com/oauth2.0/authorize
+    						# Access Token 발급, 갱신, 삭제 등을 위한 URI
+                token-uri: https://nid.naver.com/oauth2.0/token
+                # 사용자 정보 요청을 위한 경로
+                user-info-uri: https://openapi.naver.com/v1/nid/me
+                # 요청을 보낸 후, 사용자에 대한 정보가 json응답으로 돌아올 때,
+                # 돌려받은 데이터에서 어떤 key값을 username으로 사용할 것인지 지정한다.
+                # - 네이버의 경우 response 안에 상세 정보가 들어있다.
+                user-name-attribute: response
+    ```
+    
+    - `client`: OAuth2 Client, 즉 소셜 로그인 기능을 사용하고자 하는 어플리케이션이 필요로 하는 설정 내역.
+    - `provider`: OAuth2 제공자에 대한 정보 설정.
+    - `registration`: OAuth2 Client로서 필요한 정보 설정.
+    
+     네이버 외에 다른 서비스 (예: Google, Facebook 등) 의 경우 미리 준비되어 있어서 이 경우, `provider` 는 생략할 수 있다.
+    
+3. 네이버 요청 처리를 위한 빈 객체 만들기 (NaverOAuth2Service)
+    
+    ```java
+    //oauth의 과정이 일어난 다음, 사용자 정보를 받아온 상태에서 호출되는 함수
+        @Override
+        public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+            
+            OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+            
+            OAuth2User oAuth2User = delegate.loadUser(userRequest);
+    
+            String registrationId = userRequest.getClientRegistration().getRegistrationId();
+            String userNameAttributeName = userRequest
+                    // yml에 정의했던 registration uri에 대해서 어떤 uri를 기준으로 들어온 것인지 묻는 과정
+                    // - 현재 스레드에서 진행된 요청이 어떤 uri를 기준으로 진행된 건지
+                    .getClientRegistration()
+                    //정의했던 yml파일에 provider 정보를 받아오는 과정
+                    .getProviderDetails()
+                    //유저 정보를 어디에서 받아 오는지
+                    .getUserInfoEndpoint().getUserNameAttributeName();
+    
+           logger.info(oAuth2User.getAttributes().toString();
+    			 return oAuth2User;
+        }
+    ```
+    
+    - `OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate` : 사용자의 요청을 대신 받아와 줌.
+    - `OAuth2User oAuth2User` : 사용자 정보를 oAuth2User에 저장.
+    - `userRequest.getClientRegistration().getRegistrationId();` : 현재 진행중인 서비스를 문자열로 받는다.
+        - {registrationId = ‘naver’} 이런식으로 들어있다.
+    - `String userNameAttributeName` : Oauth2로그인 시 키값
+4. WebSecurityConfig 설정
+    
+    ```java
+    .and()
+    // 소셜로그인이 되었다면 로컬 로그인을 한 것처럼 취급하겠다는 의미.
+    .oauth2Login()
+    .userInfoEndpoint()
+    //NaverUserService가 들어가게 된다.
+    .userService(this.oAuth2UserService)
+    //oauth2Login 자체도 일종의 builder로 작동해서 일단 userService를 구성하고 나서
+    //성공여부 및 결과행동을 판단하게 된다.
+    .and()
+    .defaultSuccessUrl("/home")
+    ```
+    
+5. html파일 수정
+6. 반환값 설정
+    
+    ```java
+    //oauth의 과정이 일어난 다음, 사용자 정보를 받아온 상태에서 호출되는 함수
+        @Override
+        public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+            ...
+    
+          Map<String, Object> attributesMap = oAuth2User.getAttributes();
+    			Map<?, ?> responseMap = attributeMap.get("response");
+    			DefaultOAuth2User defaultOAuth2User = new DefaultOAuth2User(
+                    //기본적으로 어떤 권한을 가지고 있는지 지정
+                    Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
+                    responseMap,
+    								"email");
+    			return defaultOAuth2User;
+        }
+    ```
+    
+
+## JSON Web Token
+
+![JWT](https://user-images.githubusercontent.com/59648372/161184072-fa415364-2157-4498-8b1d-945edd12d050.png)
+
+
+공개키 암호화를 이용해서 사용자 권한을 안전하게 주고 받는 용도.
+
+- header
+    - JWT를 만들기 위해 사용한 알고리즘 정보
+- payload
+    - claim 사용자 권한 정보를 담는 부분
+- signature
+    - JWT가 유효한지 검증하는 부분.
+
+JWT 같은 경우에는 비밀키를 사용해서 암호화를 진행하고 공개키를 통해서 복호화를 한다.
+
+- 비밀키를 이용해 암호화 : JWT 토큰 발행할 수 있는 대상이 한정적임을 의미
+- 공개키를 통해 복호화 : 암호를 해석할 수 있는 대상에 대해 제한이 없음
+
+즉, 일종의 자격증처럼 제공할 수 있는 대상이 한정적이다 보니, 사용자의 권한이 같이 포함되면 변조하기가 힘들다는 장점이 있다.
