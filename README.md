@@ -11,6 +11,5 @@
 | 7주차 | 자바 예외처리, Filter & Interceptor 및 테스트 코드 작성 | [Chapter7](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter7) |
 | 8주차 | Spring Security & OAuth2 | [Chapter8](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter8) |
 | 9주차 | Job-Queue&Pub-Sub Pattern 구현 및 RabbitMQ, Redis사용. WebSocker, WebClient 구현 | [Chapter9](https://github.com/Kal-MH/Project_Lion_JavaSpringBoot_Lecture/tree/master/Chapter9) |
-| 10주차 | Cloud Cofnig & Batch| |
 
 ### [Project_Lion_Mission_Git](https://github.com/Kal-MH/Spring_Boot_Mission)
